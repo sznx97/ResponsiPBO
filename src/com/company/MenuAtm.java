@@ -8,9 +8,14 @@ import java.util.Scanner;
 public class MenuAtm extends Akun{
     Scanner menuInput = new Scanner(System.in);
     DecimalFormat formatUang = new DecimalFormat("'Rp'###,###.00");
+    private int moneyDrawn = 0;
+    private int attempt = 0;
+    private double[] noRek = {2000018441,2000018442, 2000018439, 2000018438, 2000018437};
+    private HashMap<Integer, Integer> data = new HashMap<Integer, Integer>();
 
-    HashMap<Integer, Integer> data = new HashMap<Integer, Integer>();
-
+    public double[] getNoRek(){
+        return this.noRek;
+    }
     public void getLogin() throws IOException{
         int x = 1;
         do{
@@ -24,7 +29,7 @@ public class MenuAtm extends Akun{
                 setNoPin(menuInput.nextInt());
             }catch (Exception e){
                 System.out.println("Hanya boleh angka!");
-                x = 2;
+                x++;
             }
             int nc = getNoCust();
             int np = getNoPin();
@@ -32,9 +37,9 @@ public class MenuAtm extends Akun{
                 getAkun();
             } else
                 System.out.println("Pin atau Rekening salah");
-        }while (x == 1);
+        }while (x <=3);
     }
-    public void getAkun(){
+    public void getAkun() throws IOException {
         System.out.println("Menu Akun :");
         System.out.println("Type 1 - Informasi saldo");
         System.out.println("Type 2 - Penarikan uang");
@@ -48,19 +53,34 @@ public class MenuAtm extends Akun{
         switch (pilihan){
             case 1:
                 System.out.println("Saldo : " + formatUang.format(getSaldo()));
-                getAkun();
                 break;
             case 2:
-                getInputPenarikanSaldo();
-                getAkun();
+                if(attempt<3){
+                    int besarnya = getInputPenarikanSaldo(this.moneyDrawn);
+                    if(besarnya == -1){
+                        attempt++;
+                    }else {
+                        this.moneyDrawn += besarnya;
+                    }
+                }else {
+                    System.out.println("Anda sudah terblokir");
+                }
+
                 break;
             case 3:
                 getInputDepositoSaldo();
-                getAkun();
+                break;
+            case 4:
+                getInputTransfer();
+                break;
+            case 5:
+                getLogin();
+                break;
             default:
                 System.out.println("Invalid");
-                getAkun();
+                break;
         }
+        getAkun();
 
     }
 }
